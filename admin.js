@@ -223,7 +223,7 @@ formFeria.addEventListener('submit', async (e) => {
 
         mostrarToast("Feria guardada");
         closeModal('modal-feria');
-        cargarFerias();
+        cargarFerias(false);
     } catch (err) {
         console.error(err);
         mostrarToast("Error al guardar la feria", true);
@@ -233,10 +233,12 @@ formFeria.addEventListener('submit', async (e) => {
     }
 });
 
-async function cargarFerias() {
+async function cargarFerias(mostrarSkeleton = true) {
     const lista = document.getElementById('lista-ferias');
     const stats = document.getElementById('stats-ferias');
-    lista.innerHTML = `<div class="skeleton h-24"></div><div class="skeleton h-24"></div>`;
+    if (mostrarSkeleton) {
+        lista.innerHTML = `<div class="skeleton h-24"></div><div class="skeleton h-24"></div>`;
+    }
     try {
         const snap = await db.collection('ferias').orderBy('createdAt', 'desc').get();
         const total = snap.size;
@@ -322,7 +324,7 @@ async function eliminarFeria(id) {
     try {
         await db.collection('ferias').doc(id).delete();
         mostrarToast("Feria eliminada");
-        cargarFerias();
+        cargarFerias(false);
     } catch (err) {
         mostrarToast("Error al eliminar", true);
     }
@@ -353,7 +355,7 @@ document.getElementById('g-file').addEventListener('change', async (e) => {
             });
         }
         mostrarToast(files.length > 1 ? "Fotos subidas" : "Foto subida");
-        cargarGaleria();
+        cargarGaleria(false);
     } catch (err) {
         console.error(err);
         mostrarToast("Error al subir alguna foto", true);
@@ -363,9 +365,11 @@ document.getElementById('g-file').addEventListener('change', async (e) => {
     }
 });
 
-async function cargarGaleria() {
+async function cargarGaleria(mostrarSkeleton = true) {
     const lista = document.getElementById('lista-galeria');
-    lista.innerHTML = `<div class="skeleton h-32"></div><div class="skeleton h-32"></div><div class="skeleton h-32"></div><div class="skeleton h-32"></div>`;
+    if (mostrarSkeleton) {
+        lista.innerHTML = `<div class="skeleton h-32"></div><div class="skeleton h-32"></div><div class="skeleton h-32"></div><div class="skeleton h-32"></div>`;
+    }
     try {
         const snap = await db.collection('galeria').orderBy('orden', 'asc').get();
         if (snap.empty) {
@@ -401,7 +405,7 @@ async function eliminarFoto(id) {
     try {
         await db.collection('galeria').doc(id).delete();
         mostrarToast("Foto eliminada");
-        cargarGaleria();
+        cargarGaleria(false);
     } catch (err) {
         mostrarToast("Error al eliminar", true);
     }
@@ -470,7 +474,7 @@ formEmprendedor.addEventListener('submit', async (e) => {
         }
         mostrarToast("Emprendedor guardado");
         closeModal('modal-emprendedor');
-        cargarEmprendedores();
+        cargarEmprendedores(false);
     } catch (err) {
         console.error(err);
         mostrarToast("Error al guardar", true);
@@ -480,10 +484,12 @@ formEmprendedor.addEventListener('submit', async (e) => {
     }
 });
 
-async function cargarEmprendedores() {
+async function cargarEmprendedores(mostrarSkeleton = true) {
     const lista = document.getElementById('lista-emprendedores');
     const stats = document.getElementById('stats-emprendedores');
-    lista.innerHTML = `<div class="skeleton h-28"></div><div class="skeleton h-28"></div>`;
+    if (mostrarSkeleton) {
+        lista.innerHTML = `<div class="skeleton h-28"></div><div class="skeleton h-28"></div>`;
+    }
     try {
         const snap = await db.collection('emprendedores').orderBy('orden', 'asc').get();
         const conTestimonio = snap.docs.filter(d => (d.data().testimonio || '').trim()).length;
@@ -556,7 +562,7 @@ async function eliminarEmprendedor(id) {
     try {
         await db.collection('emprendedores').doc(id).delete();
         mostrarToast("Emprendedor eliminado");
-        cargarEmprendedores();
+        cargarEmprendedores(false);
     } catch (err) {
         mostrarToast("Error al eliminar", true);
     }
@@ -576,9 +582,11 @@ const ESTADO_LABEL = { pendiente: "Pendiente", aceptado: "Aceptado", rechazado: 
 let __postulacionesCache = [];
 let __filtroPostulaciones = 'todas';
 
-async function cargarPostulaciones() {
+async function cargarPostulaciones(mostrarSkeleton = true) {
     const lista = document.getElementById('lista-postulaciones');
-    lista.innerHTML = `<div class="skeleton h-24"></div><div class="skeleton h-24"></div>`;
+    if (mostrarSkeleton) {
+        lista.innerHTML = `<div class="skeleton h-24"></div><div class="skeleton h-24"></div>`;
+    }
     try {
         const snap = await db.collection('postulaciones').orderBy('createdAt', 'desc').get();
         __postulacionesCache = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -695,7 +703,7 @@ async function cambiarEstadoPostulacion(id, estado) {
     try {
         await db.collection('postulaciones').doc(id).update({ estado });
         mostrarToast("Estado actualizado");
-        cargarPostulaciones();
+        cargarPostulaciones(false);
     } catch (err) {
         mostrarToast("Error al actualizar", true);
     }
@@ -705,7 +713,7 @@ async function eliminarPostulacion(id) {
     try {
         await db.collection('postulaciones').doc(id).delete();
         mostrarToast("Postulación eliminada");
-        cargarPostulaciones();
+        cargarPostulaciones(false);
     } catch (err) {
         mostrarToast("Error al eliminar", true);
     }
