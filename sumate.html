@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Sumate a la web - Comunidad Emprendedora</title>
+    <link rel="shortcut icon" href="foco-nuevo-rem.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-yellow-comunidad { background-color: #FBBF24; }
+        .text-yellow-comunidad { color: #FBBF24; }
+        
+        /* Ajuste de foco para campos oscuros */
+        input:focus, textarea:focus { 
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3); 
+            border-color: #FBBF24 !important; 
+        }
+
+        /* Fondo de página con degradado sutil */
+        .bg-main {
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+        }
+
+        /* Evitar zoom automático en iOS al seleccionar inputs */
+        @media screen and (max-width: 768px) {
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-main flex items-center justify-center p-3 sm:p-4 md:p-8">
+
+    <div class="w-full max-w-xl my-auto">
+        <div class="bg-slate-900 rounded-3xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-800">
+            
+            <div class="p-6 sm:p-8 md:p-10 text-center relative overflow-hidden border-b border-slate-800">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-comunidad rounded-full blur-[70px] opacity-20 -mr-16 -mt-16"></div>
+                
+                <img src="foco-nuevo-rem.png" alt="Logo" class="w-12 h-12 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tighter text-white leading-tight">
+                    SUMÁ TU <span class="text-yellow-comunidad">EMPRENDIMIENTO</span>
+                </h1>
+                <p class="text-slate-500 text-[10px] md:text-xs mt-2 font-bold uppercase tracking-widest">
+                    Completá el formulario para aparecer en la web.
+                </p>
+            </div>
+
+            <form id="form-sumate" class="p-5 sm:p-6 md:p-10 space-y-4 sm:space-y-5">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] md:text-xs font-black uppercase text-white ml-1 tracking-wider">Emprendimiento</label>
+                        <input type="text" name="marca" required placeholder="Nombre del emprendimiento" 
+                            class="w-full p-3.5 bg-slate-800/50 rounded-xl border border-slate-700 outline-none text-sm text-white placeholder:text-slate-600 transition-all focus:bg-slate-800">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] md:text-xs font-black uppercase text-white ml-1 tracking-wider">Rubro</label>
+                        <input type="text" name="rubro" required placeholder="Ej: Moda" 
+                            class="w-full p-3.5 bg-slate-800/50 rounded-xl border border-slate-700 outline-none text-sm text-white placeholder:text-slate-600 transition-all focus:bg-slate-800">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] md:text-xs font-black uppercase text-white ml-1 tracking-wider">Instagram</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-yellow-comunidad font-bold text-xs">@</span>
+                            <input type="text" name="instagram" required placeholder="usuario" 
+                                class="w-full p-3.5 pl-9 bg-slate-800/50 rounded-xl border border-slate-700 outline-none text-sm text-white placeholder:text-slate-600 transition-all focus:bg-slate-800">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] md:text-xs font-black uppercase text-white ml-1 tracking-wider">WhatsApp</label>
+                        <input type="tel" name="whatsapp" required placeholder="3735..." 
+                            class="w-full p-3.5 bg-slate-800/50 rounded-xl border border-slate-700 outline-none text-sm text-white placeholder:text-slate-600 transition-all focus:bg-slate-800">
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[10px] md:text-xs font-black uppercase text-white ml-1 tracking-wider">¿Qué lograste en la Comunidad?</label>
+                    <textarea name="testimonio" required placeholder="Contanos tu experiencia..." 
+                        class="w-full p-3.5 bg-slate-800/50 rounded-xl border border-slate-700 outline-none h-24 sm:h-28 text-sm text-white placeholder:text-slate-600 resize-none transition-all focus:bg-slate-800"></textarea>
+                </div>
+
+                <div class="relative group">
+                    <input type="file" id="logo-file" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                    <div id="dropzone" class="border-2 border-dashed border-slate-700 rounded-2xl p-5 sm:p-6 text-center group-hover:border-yellow-comunidad/50 transition-all bg-slate-800/30">
+                        <i class="fas fa-camera text-yellow-comunidad mb-2 opacity-70"></i>
+                        <p id="file-name" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Subí el logo de tu Emprendimiento</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-yellow-comunidad text-slate-900 font-black py-4 sm:py-5 rounded-xl hover:bg-yellow-500 transition-all shadow-[0_10px_20px_-10px_rgba(251,191,36,0.3)] uppercase text-xs tracking-widest active:scale-[0.98]">
+                    Enviar Información
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loader" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] hidden flex-col items-center justify-center text-white p-6">
+        <div class="w-12 h-12 border-4 border-yellow-comunidad border-t-transparent rounded-full animate-spin"></div>
+        <p class="font-black text-lg uppercase tracking-widest mt-4">Procesando</p>
+    </div>
+
+    <div id="modal-success" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[200] hidden items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-[2.5rem] p-8 sm:p-10 text-center max-w-xs w-full shadow-2xl border border-slate-800">
+            <div class="w-16 h-16 bg-yellow-comunidad/10 text-yellow-comunidad rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="text-xl font-black text-white uppercase mb-2">¡Hecho!</h2>
+            <p class="text-slate-400 text-xs mb-8">Tu información ha sido enviada correctamente.</p>
+            <button onclick="location.reload()" class="w-full bg-white text-slate-900 font-black py-4 rounded-xl uppercase text-xs tracking-widest">Aceptar</button>
+        </div>
+    </div>
+
+    <script src="sumate.js"></script>
+</body>
+</html>

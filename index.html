@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidad Emprendedora - Villa Ángela</title>
+    <link rel="shortcut icon" href="foco-nuevo-rem.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Firebase (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .bg-yellow-comunidad { background-color: #FBBF24; }
+        .text-yellow-comunidad { color: #FBBF24; }
+        .border-yellow-comunidad { border-color: #FBBF24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Ajuste de trazo para móviles y PC */
+        .text-stroke { -webkit-text-stroke: 1.5px white; paint-order: stroke fill; }
+        .text-stroke-yellow { -webkit-text-stroke: 1.5px #FBBF24; paint-order: stroke fill; }
+        
+        @media (min-width: 768px) {
+            .text-stroke { -webkit-text-stroke: 3px white; }
+            .text-stroke-yellow { -webkit-text-stroke: 3px #FBBF24; }
+        }
+
+        /* Estilos del botón ScrollTop */
+        #scroll-top-btn {
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        #scroll-top-btn.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Ícono de Instagram con su degradado de marca */
+        .instagram-gradient {
+            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+        }
+        .hover-instagram:hover {
+            background: linear-gradient(90deg, #fd5949, #d6249f 60%, #285AEB);
+        }
+        .hover-instagram:hover span:last-child {
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<button id="scroll-top-btn" class="fixed bottom-6 right-6 z-[100] bg-yellow-comunidad text-black w-12 h-12 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<header class="relative min-h-[600px] md:h-[650px] flex items-center bg-black overflow-hidden">
+    <img src="banner.jpg" class="absolute inset-0 w-full h-full object-cover opacity-60" alt="Feria Villa Ángela">
+    <div class="container mx-auto px-6 relative z-10">
+        <h1 class="text-white text-4xl sm:text-5xl md:text-7xl font-black leading-tight flex flex-wrap items-center text-stroke">
+            <span>COMUNIDAD</span>
+            <img src="foco-nuevo-rem.png" alt="Foco" class="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 ml-4"
+                 style="filter: brightness(1.3) drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px rgba(255,255,200,0.8));">
+        </h1>
+        
+        <h1 class="text-white text-4xl sm:text-5xl md:text-7xl font-black leading-tight">
+            <span class="text-yellow-comunidad uppercase text-stroke-yellow">
+                Emprendedora
+            </span>
+        </h1>
+
+        <p class="text-yellow-comunidad text-xl md:text-2xl font-bold mt-2 uppercase tracking-widest">Villa Ángela</p>
+        <p class="text-white text-base md:text-lg mt-4 max-w-lg">Impulsamos a los emprendedores locales.</p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 mt-8">
+            <button id="btn-feria" class="w-full sm:w-auto bg-yellow-comunidad text-black font-bold py-4 px-8 rounded-full hover:bg-yellow-500 transition flex items-center justify-center gap-2 shadow-lg">
+                <i class="fas fa-map-marker-alt"></i> Ver próxima feria
+            </button>
+            <button id="btn-participar" class="w-full sm:w-auto bg-white text-black font-bold py-4 px-8 rounded-full hover:bg-slate-100 transition flex items-center justify-center gap-2 shadow-lg">
+                <i class="far fa-edit"></i> Quiero participar
+            </button>
+        </div>
+    </div>
+    
+    <div class="absolute bottom-0 left-0 w-full leading-none z-20 translate-y-[1px]">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-[40px] md:h-[60px] fill-white">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C57.23,115.32,126.23,121.17,185.83,107.41,242.42,94.25,283.33,73.53,321.39,56.44Z"></path>
+        </svg>
+    </div>
+</header>
+
+<section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-6 text-center max-w-4xl">
+        <div class="mb-8 flex justify-center">
+            <div class="w-20 h-20 bg-yellow-100 rounded-2xl flex items-center justify-center transform rotate-3 shadow-sm">
+                <i class="fas fa-university text-yellow-600 text-3xl"></i>
+            </div>
+        </div>
+        
+        <h2 class="text-3xl md:text-4xl font-black mb-8"><span class="text-yellow-500">¿Quienes somos?</span></h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
+            <div class="space-y-4">
+                <p class="text-slate-700 text-lg leading-relaxed">
+                    Comunidad Emprendedora es un espacio pensado para acompañar a emprendedores de Villa Ángela y la zona, dándoles un lugar real donde mostrar y vender lo que hacen. Organizamos ferias periódicas, sumamos visibilidad a cada marca y construimos una red de apoyo entre quienes eligen emprender.
+                </p>
+                <p class="text-slate-600">
+                   Nuestro objetivo es fortalecer el comercio local, generar oportunidades de venta directa y ayudar a que cada emprendimiento gane presencia, tanto en la feria como en nuestras redes.
+                </p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-3xl border-l-4 border-yellow-comunidad">
+                <h4 class="font-bold text-slate-900 mb-2 uppercase text-xs tracking-widest">Impacto y Destinatarios</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                   Está pensado para emprendedores, artesanos y pequeños productores de Villa Ángela y alrededores que quieran sumarse a la comunidad y participar de las ferias.
+                </p>
+            </div>
+        </div>
+
+        <div id="contacto" class="mt-14 pt-10 border-t border-slate-100 flex flex-col items-center gap-6 scroll-mt-24">
+            <a href="faq.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-black text-white font-bold py-4 px-8 rounded-full hover:bg-slate-800 transition shadow-lg">
+                <i class="fas fa-circle-question text-yellow-comunidad"></i> Ver preguntas frecuentes
+            </a>
+
+            <div class="flex flex-col items-center gap-3">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">O escribinos directo</p>
+                <div class="flex items-center gap-4">
+                    <!-- Reemplazá el número por el real, con código de país (Ej: 5493735123456) -->
+                    <a href="https://wa.me/NUMERO_WHATSAPP" target="_blank" rel="noopener"
+                       class="group flex items-center gap-3 bg-white border border-slate-200 hover:border-transparent hover:bg-[#25D366] rounded-full pl-3 pr-5 py-3 shadow-sm hover:shadow-lg transition-all">
+                        <span class="w-9 h-9 rounded-full bg-[#25D366]/10 group-hover:bg-white/20 flex items-center justify-center flex-shrink-0 transition-colors">
+                            <i class="fab fa-whatsapp text-[#25D366] group-hover:text-white text-lg transition-colors"></i>
+                        </span>
+                        <span class="font-bold text-sm text-slate-700 group-hover:text-white transition-colors">WhatsApp</span>
+                    </a>
+
+                    <!-- Reemplazá el link por el de tu cuenta de Instagram -->
+                    <a href="https://www.instagram.com/comunidademprendedorava/" target="_blank" rel="noopener"
+                       class="group flex items-center gap-3 bg-white border border-slate-200 hover:border-transparent rounded-full pl-3 pr-5 py-3 shadow-sm hover:shadow-lg transition-all hover-instagram">
+                        <span class="w-9 h-9 rounded-full instagram-gradient flex items-center justify-center flex-shrink-0">
+                            <i class="fab fa-instagram text-white text-lg"></i>
+                        </span>
+                        <span class="font-bold text-sm text-slate-700 transition-colors">Instagram</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-12 md:py-20 bg-slate-50 overflow-hidden">
+    <div class="container mx-auto px-6">
+        <h2 class="text-2xl md:text-3xl font-black text-center mb-10">Galería de fotos</h2>
+        
+        <div class="relative flex items-center"> 
+            <button id="gallery-prev" class="hidden md:flex absolute -left-2 md:left-4 z-30 bg-white/90 w-12 h-12 rounded-full items-center justify-center shadow-xl hover:bg-yellow-comunidad transition active:scale-95">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <div id="gallery-container" class="flex overflow-x-auto gap-4 md:gap-6 pb-6 no-scrollbar snap-x px-2">
+                <!-- Las fotos se cargan dinámicamente desde Firestore (colección "galeria") vía site-data.js -->
+                <p id="gallery-empty" class="text-slate-400 text-sm italic px-2 hidden">Todavía no hay fotos cargadas.</p>
+            </div>
+
+            <button id="gallery-next" class="hidden md:flex absolute -right-2 md:right-4 z-30 bg-white/90 w-12 h-12 rounded-full items-center justify-center shadow-xl hover:bg-yellow-comunidad transition active:scale-95">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <p class="md:hidden text-center text-slate-400 text-xs mt-2 italic">← Desliza para ver más fotos →</p>
+    </div>
+</section>
+
+<section id="seccion-feria" class="py-16 md:py-24 bg-white relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-100/50 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-slate-100 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none"></div>
+
+    <div class="container mx-auto px-6 relative z-10">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-black mb-2">Próximos eventos</h2>
+            <p class="text-slate-400 uppercase tracking-widest text-xs font-bold">¡Agendá las fechas y vení a visitarnos!</p>
+        </div>
+
+        <div class="max-w-5xl mx-auto">
+            <!-- Contenido cargado dinámicamente desde Firestore (colección "ferias") vía site-data.js -->
+            <div id="feria-card" class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100 flex flex-col md:flex-row transition-all hover:shadow-yellow-200/20 hidden">
+
+               <div class="relative w-full md:w-2/5 h-64 md:h-auto overflow-hidden">
+    <div id="feria-flyer-click" class="relative group cursor-pointer w-full h-full">
+
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 z-20">
+            <i class="fas fa-search-plus text-white text-3xl"></i>
+            <span class="text-white text-[10px] font-black uppercase tracking-widest">Ver flyer completo</span>
+        </div>
+
+        <img id="feria-flyer" src="" class="w-full h-full object-cover" alt="Flyer de la próxima feria">
+    </div>
+
+    <div class="absolute top-6 left-6 bg-white rounded-2xl shadow-xl p-3 text-center min-w-[70px] z-10">
+        <p id="feria-mes" class="text-xs font-black uppercase text-slate-400 leading-none mb-1"></p>
+        <p id="feria-dia-num" class="text-3xl font-black text-black leading-none"></p>
+    </div>
+
+    <div class="absolute bottom-4 left-4 z-10">
+        <span class="bg-yellow-comunidad text-black text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-lg">
+            Próxima Edición
+        </span>
+    </div>
+</div>
+
+                <div class="w-full md:w-3/5 p-8 md:p-12 flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="h-1 w-10 bg-yellow-comunidad rounded-full"></div>
+                        <span id="feria-dia-semana" class="text-yellow-600 font-bold text-xs uppercase tracking-tighter"></span>
+                    </div>
+
+                    <h3 id="feria-titulo" class="text-3xl md:text-4xl font-black text-slate-900 mb-6 leading-tight"></h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-clock text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Horario</p>
+                                <p id="feria-horario" class="text-slate-700 font-bold"></p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Ubicación</p>
+                                <p id="feria-ubicacion" class="text-slate-700 font-bold"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button id="feria-btn-mapa"
+                                class="flex-1 bg-black text-white py-4 rounded-2xl font-black text-sm hover:bg-slate-800 transition shadow-xl shadow-black/10 flex items-center justify-center gap-2">
+                            <i class="fas fa-location-dot"></i> Ver ubicación
+                        </button>
+                        <a href="#contacto" class="flex-1 bg-yellow-comunidad text-black py-4 rounded-2xl font-black text-sm hover:bg-yellow-500 transition shadow-xl shadow-yellow-200 flex items-center justify-center gap-2 uppercase">
+                            Quiero participar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <p id="feria-sin-eventos" class="text-center text-slate-400 italic hidden">Por el momento no hay ninguna feria programada. ¡Volvé a visitarnos pronto!</p>
+
+            <p class="text-center mt-12 text-slate-400 text-sm italic font-medium">
+                "Una tarde para disfrutar en familia y apoyar lo nuestro."
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="py-16 md:py-24 bg-slate-50 overflow-hidden text-center">
+    <div class="container mx-auto px-6">
+        <h2 class="text-2xl md:text-3xl font-black mb-12">Emprendedores que participan</h2>
+        <div class="relative flex items-center">
+            <div id="carousel-container" class="flex overflow-x-auto gap-6 md:gap-10 pb-10 no-scrollbar pointer-events-none px-4 md:px-10">
+                <!-- Los emprendedores se cargan dinamicamente desde Firestore (coleccion emprendedores) via site-data.js -->
+            </div> </div> </div> 
+    </section>
+
+<section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-2xl md:text-3xl font-black mb-16">Lo que dicen nuestros emprendedores</h2>
+        <div id="testimonios-container" class="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
+            <!-- Los testimonios se cargan dinámicamente desde Firestore (emprendedores con campo "testimonio") vía site-data.js -->
+        </div>
+        <p id="testimonios-empty" class="text-slate-400 text-sm italic hidden">Todavía no hay testimonios cargados.</p>
+    </div>
+</section>
+  <footer class="bg-slate-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 text-center md:text-left">
+            <div>
+                <h3 class="text-2xl font-black mb-4">COMUNIDAD <span class="text-yellow-comunidad uppercase">Emprendedora</span></h3>
+                <p class="text-slate-400 text-sm">Impulsando el comercio local y el espíritu emprendedor en Villa Ángela, Chaco.</p>
+            </div>
+            <div class="md:pl-10">
+                <h4 class="font-bold mb-4 uppercase text-yellow-comunidad text-xs tracking-widest">Navegación</h4>
+                <ul class="space-y-2 text-slate-400 text-sm">
+                    <li><a href="#" class="hover:text-white transition">Inicio</a></li>
+                    <li><a href="#seccion-feria" class="hover:text-white transition">Próximos eventos</a></li>
+                    <li><a href="#contacto" class="hover:text-white transition">Contacto</a></li>
+                    <li><a href="faq.html" class="hover:text-yellow-comunidad transition font-bold">Preguntas Frecuentes</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 uppercase text-yellow-comunidad text-xs tracking-widest">Contacto</h4>
+                <div class="flex justify-center md:justify-start gap-6 text-2xl">
+                    <a href="https://www.instagram.com/comunidademprendedorava/" class="hover:text-yellow-comunidad transition"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:text-yellow-comunidad transition"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="container mx-auto px-6 mt-16 pt-8 border-t border-slate-800 text-center">
+            <p class="text-[10px] md:text-xs text-slate-500 opacity-60 italic">© 2026 Comunidad Emprendedora Villa Ángela. Todos los derechos reservados.</p>
+            <p class="text-[10px] md:text-xs text-slate-500 opacity-60 italic">Diseñado y desarrollado por Hostara.</p>
+        </div>
+    </footer>
+
+<div id="modal-mapa" class="fixed inset-0 z-[200] hidden items-center justify-center p-2 bg-black/70 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-3xl rounded-[1.5rem] overflow-hidden shadow-2xl relative">
+        <button onclick="cerrarMapa()" class="absolute top-4 right-4 z-20 bg-white/90 w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-white">
+            <i class="fas fa-times text-slate-800"></i>
+        </button>
+        <div class="relative h-[350px] md:h-[450px] bg-slate-50">
+            <div id="map-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                <div class="w-10 h-10 border-4 border-yellow-comunidad border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <iframe id="iframe-mapa" src="" class="w-full h-full opacity-0 transition-opacity duration-500" style="border:0;" allowfullscreen="" loading="lazy" onload="quitarLoader()"></iframe>
+        </div>
+    </div>
+</div>
+<div id="modal-foto" class="fixed inset-0 z-[250] hidden items-center justify-center p-4 bg-black/95 backdrop-blur-sm transition-all duration-300">
+    
+    <button onclick="cerrarFoto()" class="absolute top-6 right-6 z-[260] bg-white/10 hover:bg-yellow-comunidad hover:text-black text-white w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-xl">
+        <i class="fas fa-times text-xl"></i>
+    </button>
+
+    <button onclick="cambiarFoto(-1)" class="absolute left-4 z-[260] text-white/50 hover:text-yellow-comunidad text-4xl p-4 transition-colors">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <div class="max-w-5xl w-full h-full flex flex-col items-center justify-center p-2">
+        <img id="img-ampliada" src="" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl transform scale-95 transition-all duration-300">
+        
+        <div id="caption-foto" class="mt-6 text-center">
+    <p class="text-white font-black text-lg md:text-xl uppercase tracking-widest flex items-center justify-center">
+        <span>Comunidad <span class="text-yellow-comunidad">Emprendedora</span></span>
+        
+        <img src="foco-nuevo-rem.png" alt="Foco" class="ml-3 h-8 w-auto object-contain">
+        
+    </p>
+    <p class="text-white/40 text-[10px] uppercase mt-1 tracking-widest">Villa Ángela - Chaco</p>
+</div>
+
+    <button onclick="cambiarFoto(1)" class="absolute right-4 z-[260] text-white/50 hover:text-yellow-comunidad text-4xl p-4 transition-colors">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+</div>
+
+<script src="site-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
