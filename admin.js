@@ -95,6 +95,7 @@ auth.onAuthStateChanged(user => {
         cargarFerias();
         cargarGaleria();
         cargarEmprendedores();
+        cargarComercios();
         cargarPostulaciones();
     } else {
         dashboard.classList.add('hidden');
@@ -139,6 +140,10 @@ document.querySelectorAll('.nav-item').forEach(btn => {
 
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         document.getElementById(btn.dataset.panel).classList.add('active');
+
+        // En mobile, el menú se abre superpuesto en pantalla completa;
+        // al elegir una sección lo cerramos para ver el contenido.
+        if (typeof cerrarSidebarMobile === 'function') cerrarSidebarMobile();
     });
 });
 
@@ -203,17 +208,9 @@ formFeria.addEventListener('submit', async (e) => {
     btn.textContent = "Guardando...";
 
     try {
-        // Si esta feria queda como "activa", desactivamos las demás para que
-        // en la web pública se muestre siempre una sola como "próxima".
-        if (activa) {
-            const activas = await db.collection('ferias').where('activa', '==', true).get();
-            const batch = db.batch();
-            activas.forEach(doc => {
-                if (doc.id !== id) batch.update(doc.ref, { activa: false });
-            });
-            await batch.commit();
-        }
-
+        // Ahora se pueden tener varias ferias activas al mismo tiempo (por
+        // ejemplo la de este fin de semana y la siguiente), así que ya no
+        // desactivamos las demás automáticamente.
         if (id) {
             await db.collection('ferias').doc(id).update(data);
         } else {
@@ -242,12 +239,12 @@ async function cargarFerias(mostrarSkeleton = true) {
     try {
         const snap = await db.collection('ferias').orderBy('createdAt', 'desc').get();
         const total = snap.size;
-        const activa = snap.docs.find(d => d.data().activa);
+        const activas = snap.docs.filter(d => d.data().activa);
 
         stats.innerHTML = `
             ${statChip('fa-calendar-days', total, total === 1 ? 'feria cargada' : 'ferias cargadas')}
-            ${activa
-                ? statChip('fa-circle-check', escaparHtml(activa.data().titulo), 'visible en la web ahora', 'text-green-600')
+            ${activas.length
+                ? statChip('fa-circle-check', activas.length, activas.length === 1 ? 'feria visible en la web' : 'ferias visibles en la web', 'text-green-600')
                 : statChip('fa-triangle-exclamation', 'Ninguna', 'feria visible en la web', 'text-amber-600')}
         `;
 
@@ -563,6 +560,160 @@ async function eliminarEmprendedor(id) {
         await db.collection('emprendedores').doc(id).delete();
         mostrarToast("Emprendedor eliminado");
         cargarEmprendedores(false);
+    } catch (err) {
+        mostrarToast("Error al eliminar", true);
+    }
+}
+
+/* =========================================================
+   3.5 COMERCIOS
+   (Igual que emprendedores, pero sin testimonio: los comercios
+   están adheridos y no participan directamente de la feria.)
+   ========================================================= */
+
+const formComercio = document.getElementById('form-comercio');
+
+document.getElementById('btn-nuevo-comercio').addEventListener('click', () => {
+    resetFormComercio();
+    document.getElementById('modal-comercio-titulo').textContent = "Nuevo comercio";
+    document.getElementById('btn-guardar-comercio').textContent = "Guardar comercio";
+    openModal('modal-comercio');
+});
+
+function resetFormComercio() {
+    formComercio.reset();
+    document.getElementById('c-id').value = "";
+    document.getElementById('c-logoUrl').value = "";
+    document.getElementById('c-logo-preview').classList.add('hidden');
+    document.getElementById('c-logo-label').textContent = "Elegir imagen";
+}
+
+document.getElementById('c-logo-file').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+        document.getElementById('c-logo-label').textContent = "Subiendo...";
+        const url = await subirImagenCloudinary(file);
+        document.getElementById('c-logoUrl').value = url;
+        const preview = document.getElementById('c-logo-preview');
+        preview.src = url;
+        preview.classList.remove('hidden');
+        document.getElementById('c-logo-label').textContent = "Cambiar imagen";
+        mostrarToast("Logo subido");
+    } catch (err) {
+        document.getElementById('c-logo-label').textContent = "Elegir imagen";
+        mostrarToast("Error al subir el logo", true);
+    }
+});
+
+formComercio.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('c-id').value;
+    const btn = document.getElementById('btn-guardar-comercio');
+    const data = {
+        nombre: document.getElementById('c-nombre').value,
+        categoria: document.getElementById('c-categoria').value,
+        orden: Number(document.getElementById('c-orden').value) || 0,
+        logoUrl: document.getElementById('c-logoUrl').value
+    };
+
+    btn.disabled = true;
+    btn.textContent = "Guardando...";
+
+    try {
+        if (id) {
+            await db.collection('comercios').doc(id).update(data);
+        } else {
+            data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('comercios').add(data);
+        }
+        mostrarToast("Comercio guardado");
+        closeModal('modal-comercio');
+        cargarComercios(false);
+    } catch (err) {
+        console.error(err);
+        mostrarToast("Error al guardar", true);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Guardar comercio";
+    }
+});
+
+async function cargarComercios(mostrarSkeleton = true) {
+    const lista = document.getElementById('lista-comercios');
+    const stats = document.getElementById('stats-comercios');
+    if (mostrarSkeleton) {
+        lista.innerHTML = `<div class="skeleton h-28"></div><div class="skeleton h-28"></div>`;
+    }
+    try {
+        const snap = await db.collection('comercios').orderBy('orden', 'asc').get();
+
+        stats.innerHTML = `
+            ${statChip('fa-shop', snap.size, snap.size === 1 ? 'comercio cargado' : 'comercios cargados')}
+        `;
+
+        if (snap.empty) {
+            lista.innerHTML = estadoVacio('fa-shop', 'Todavía no cargaste comercios', 'Sumá el primero para que aparezca en el sitio.', 'md:col-span-2');
+            return;
+        }
+        lista.innerHTML = snap.docs.map(doc => {
+            const c = doc.data();
+            return `
+            <div class="card p-5 flex items-start gap-4">
+                ${c.logoUrl
+                    ? `<img src="${escaparHtml(c.logoUrl)}" class="w-12 h-12 rounded-full object-cover bg-slate-100 flex-shrink-0">`
+                    : avatarHtml(c.nombre)}
+                <div class="flex-1 min-w-0">
+                    <p class="font-bold">${escaparHtml(c.nombre)}</p>
+                    ${c.categoria ? `<p class="text-slate-400 text-xs uppercase tracking-widest mt-0.5">${escaparHtml(c.categoria)}</p>` : ''}
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                    <button data-editar-comercio="${doc.id}" class="btn-icon bg-slate-100 hover:bg-slate-200"><i class="fas fa-pen text-xs"></i></button>
+                    <button data-eliminar-comercio="${doc.id}" data-nombre="${escaparHtml(c.nombre)}" class="btn-icon bg-red-50 hover:bg-red-100 text-red-500"><i class="fas fa-trash text-xs"></i></button>
+                </div>
+            </div>`;
+        }).join('');
+
+        lista.querySelectorAll('[data-editar-comercio]').forEach(b => b.addEventListener('click', () => editarComercio(b.dataset.editarComercio)));
+        lista.querySelectorAll('[data-eliminar-comercio]').forEach(b => b.addEventListener('click', () => {
+            pedirConfirmacion({
+                titulo: `¿Eliminar "${b.dataset.nombre}"?`,
+                texto: "Este comercio se va a borrar de forma permanente.",
+                onConfirm: () => eliminarComercio(b.dataset.eliminarComercio)
+            });
+        }));
+    } catch (err) {
+        console.error(err);
+        lista.innerHTML = `<p class="text-red-500 text-sm">Error al cargar los comercios.</p>`;
+    }
+}
+
+async function editarComercio(id) {
+    const doc = await db.collection('comercios').doc(id).get();
+    const c = doc.data();
+    document.getElementById('c-id').value = id;
+    document.getElementById('c-nombre').value = c.nombre || '';
+    document.getElementById('c-categoria').value = c.categoria || '';
+    document.getElementById('c-orden').value = c.orden || 0;
+    document.getElementById('c-logoUrl').value = c.logoUrl || '';
+
+    const preview = document.getElementById('c-logo-preview');
+    if (c.logoUrl) {
+        preview.src = c.logoUrl;
+        preview.classList.remove('hidden');
+        document.getElementById('c-logo-label').textContent = "Cambiar imagen";
+    }
+
+    document.getElementById('modal-comercio-titulo').textContent = "Editar comercio";
+    document.getElementById('btn-guardar-comercio').textContent = "Guardar cambios";
+    openModal('modal-comercio');
+}
+
+async function eliminarComercio(id) {
+    try {
+        await db.collection('comercios').doc(id).delete();
+        mostrarToast("Comercio eliminado");
+        cargarComercios(false);
     } catch (err) {
         mostrarToast("Error al eliminar", true);
     }
