@@ -13,24 +13,26 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 2. CARRUSEL INFINITO Y FLUIDO (EMPRENDEDORES)
+    // 2. CARRUSEL INFINITO Y FLUIDO (EMPRENDEDORES Y COMERCIOS)
     // Expuesta globalmente porque el contenido real se carga después, en tiempo
     // real desde Firestore (ver site-data.js), y puede volver a llamarse cada
-    // vez que cambian los emprendedores (alta/baja/edición desde el admin).
-    let carruselAnimationId = null;
-    window.iniciarCarruselInfinito = function iniciarCarruselInfinito() {
-        const container = document.getElementById('carousel-container');
+    // vez que cambian los emprendedores/comercios (alta/baja/edición desde el admin).
+    // Recibe el id del contenedor para poder reutilizarla en ambas secciones;
+    // por compatibilidad, si no se pasa nada, usa "carousel-container" (emprendedores).
+    const carruselAnimationIds = {};
+    window.iniciarCarruselInfinito = function iniciarCarruselInfinito(containerId = 'carousel-container') {
+        const container = document.getElementById(containerId);
         if (!container || !container.children.length) return;
 
         // Si ya había un loop de scroll corriendo (de una carga anterior),
         // lo cancelamos para no acumular loops duplicados.
-        if (carruselAnimationId) {
-            cancelAnimationFrame(carruselAnimationId);
-            carruselAnimationId = null;
+        if (carruselAnimationIds[containerId]) {
+            cancelAnimationFrame(carruselAnimationIds[containerId]);
+            carruselAnimationIds[containerId] = null;
         }
         container.scrollLeft = 0;
 
-        // Con pocos emprendedores, todos entran en pantalla sin necesidad de
+        // Con pocos elementos, todos entran en pantalla sin necesidad de
         // scroll: si duplicáramos igual, se verían literalmente repetidos.
         // Solo duplicamos (y animamos) cuando el contenido real desborda el
         // contenedor y hace falta el efecto de loop infinito.
@@ -52,9 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollPos = 0;
             }
             container.scrollLeft = scrollPos;
-            carruselAnimationId = requestAnimationFrame(autoScroll);
+            carruselAnimationIds[containerId] = requestAnimationFrame(autoScroll);
         }
-        carruselAnimationId = requestAnimationFrame(autoScroll);
+        carruselAnimationIds[containerId] = requestAnimationFrame(autoScroll);
     };
 
     // 3. LÓGICA DE PREGUNTAS FRECUENTES (FAQ ACCORDION)
@@ -258,4 +260,54 @@ window.addEventListener('keydown', (e) => {
         if (e.key === "ArrowRight") cambiarFoto(1);
         if (e.key === "ArrowLeft") cambiarFoto(-1);
     }
+});
+
+// 9. SKELETONS DE CARGA (mientras llegan los datos de Firestore)
+// No dependen de que site-data.js las llame explícitamente: se limpian solas
+// apenas detectan contenido real, así que funcionan aunque cambie la forma
+// en la que site-data.js arma el HTML.
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Tiempo máximo que dejamos un skeleton visible aunque no haya llegado
+    // contenido real (por ejemplo, si Firestore tarda o falla). Evita que
+    // quede "cargando" para siempre.
+    const SKELETON_TIMEOUT_MS = 15000;
+
+    // 9.1 Contenedores donde el contenido real se agrega como hijos nuevos
+    // (galería, emprendedores, testimonios): apenas aparece un hijo que no es
+    // un skeleton, quitamos los placeholders.
+    function observarSkeletonPorHijos(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const quitarSkeletons = () => {
+            container.querySelectorAll('[data-skeleton]').forEach(el => el.remove());
+        };
+
+        const hayContenidoReal = () =>
+            Array.from(container.children).some(el => !el.hasAttribute('data-skeleton'));
+
+        if (hayContenidoReal()) {
+            quitarSkeletons();
+            return;
+        }
+
+        const observer = new MutationObserver(() => {
+            if (hayContenidoReal()) {
+                quitarSkeletons();
+                observer.disconnect();
+            }
+        });
+        observer.observe(container, { childList: true });
+
+        setTimeout(() => {
+            quitarSkeletons();
+            observer.disconnect();
+        }, SKELETON_TIMEOUT_MS);
+    }
+
+    // 9.2 "ferias-container" ahora puede recibir una o varias tarjetas de
+    // feria (antes era una sola tarjeta fija), así que usa el mismo
+    // mecanismo por-hijos que galería/comercios/emprendedores.
+    ['gallery-container', 'carousel-container', 'comercios-container', 'testimonios-container', 'ferias-container'].forEach(observarSkeletonPorHijos);
 });
