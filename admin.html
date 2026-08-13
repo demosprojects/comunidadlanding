@@ -111,8 +111,26 @@
 <!-- ===================== DASHBOARD ===================== -->
 <div id="dashboard" class="hidden min-h-screen flex flex-col md:flex-row">
 
-    <!-- Sidebar (sin cambios) -->
-    <aside class="bg-black text-white w-full md:w-64 md:min-h-screen flex md:flex-col justify-between">
+    <!-- TOP BAR MOBILE -->
+    <header class="md:hidden sticky top-0 z-30 flex items-center justify-between gap-3 bg-black text-white px-4 py-3 border-b border-white/10 shadow-lg">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <span class="text-base font-black tracking-tight uppercase truncate">
+                Comunidad <span class="text-yellow-comunidad">Admin</span>
+            </span>
+        </div>
+        <button onclick="abrirSidebarMobile()" aria-label="Abrir menú" class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+    </header>
+
+    <!-- OVERLAY MOBILE -->
+    <div id="sidebar-overlay" onclick="cerrarSidebarMobile()" class="hidden fixed inset-0 bg-black/70 z-30 md:hidden"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed md:sticky inset-y-0 left-0 md:top-0 md:h-screen w-72 max-w-[85vw] -translate-x-full md:translate-x-0 transition-transform duration-300 ease-out overflow-y-auto bg-black text-white md:w-64 flex flex-col justify-between border-r border-white/5 z-40 shadow-2xl">
+        <button onclick="cerrarSidebarMobile()" aria-label="Cerrar menú" class="md:hidden absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition">
+            ✕
+        </button>
         <div class="p-6 flex-1">
             <h2 class="font-black text-lg mb-1">COMUNIDAD <span class="text-yellow-comunidad">EMPRENDEDORA</span></h2>
             <p class="text-slate-500 text-[10px] uppercase tracking-widest font-bold mb-8">Panel administrador</p>
@@ -127,6 +145,9 @@
                 <button data-panel="panel-emprendedores" class="nav-item w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-3 transition text-slate-300 hover:bg-slate-800">
                     <i class="fas fa-store w-4"></i> Emprendedores
                 </button>
+                <button data-panel="panel-comercios" class="nav-item w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-3 transition text-slate-300 hover:bg-slate-800">
+                    <i class="fas fa-shop w-4"></i> Comercios
+                </button>
                 <button data-panel="panel-postulaciones" class="nav-item w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-3 transition text-slate-300 hover:bg-slate-800">
                     <i class="fas fa-clipboard-list w-4"></i> Postulaciones
                     <span id="badge-postulaciones" class="ml-auto bg-yellow-comunidad text-black text-[10px] font-black rounded-full px-2 py-0.5 hidden"></span>
@@ -134,7 +155,7 @@
             </nav>
         </div>
 
-        <div class="p-6 border-t border-slate-800">
+        <div class="p-6 border-t border-slate-800 flex-shrink-0">
             <p id="login-user-email" class="text-slate-400 text-xs mb-3 truncate"></p>
             <button id="btn-logout" class="text-slate-300 hover:text-yellow-comunidad text-sm font-bold flex items-center gap-2">
                 <i class="fas fa-arrow-right-from-bracket"></i> Cerrar sesión
@@ -143,7 +164,7 @@
     </aside>
 
     <!-- Contenido -->
-    <main class="flex-1 p-6 md:p-10 max-w-6xl w-full">
+    <main class="flex-1 p-4 sm:p-6 md:p-10 max-w-6xl w-full min-w-0">
 
         <!-- ---------- PANEL FERIAS ---------- -->
         <section id="panel-ferias" class="panel active">
@@ -198,6 +219,23 @@
             <div id="stats-emprendedores" class="flex gap-3 flex-wrap mb-6"></div>
 
             <div id="lista-emprendedores" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- ---------- PANEL COMERCIOS ---------- -->
+        <section id="panel-comercios" class="panel">
+            <div class="flex items-start justify-between gap-4 flex-wrap mb-6">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-black tracking-tight">Comercios adheridos</h2>
+                    <p class="text-slate-400 text-sm mt-1">Comercios que apoyan a la comunidad, sin participar directamente en la feria.</p>
+                </div>
+                <button id="btn-nuevo-comercio" class="btn-accent flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Nuevo comercio
+                </button>
+            </div>
+
+            <div id="stats-comercios" class="flex gap-3 flex-wrap mb-6"></div>
+
+            <div id="lista-comercios" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
         <!-- ---------- PANEL POSTULACIONES ---------- -->
@@ -277,7 +315,7 @@
 
             <label class="flex items-center gap-3 text-sm font-bold bg-slate-50 border border-slate-200 rounded-xl p-4 cursor-pointer">
                 <input type="checkbox" id="f-activa" class="w-4 h-4 accent-black">
-                Mostrar como próxima feria en la web
+                <span>Mostrar en la web<br><span class="font-normal text-xs text-slate-400">Podés activar más de una feria a la vez: se muestran todas, apiladas, en orden de carga.</span></span>
             </label>
 
             <div class="flex gap-3 pt-2">
@@ -341,6 +379,53 @@
     </div>
 </div>
 
+<!-- ===================== MODAL: COMERCIO ===================== -->
+<div id="modal-comercio" class="modal">
+    <div class="modal-panel card w-full max-w-lg max-h-[92vh] overflow-y-auto p-7 md:p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h3 id="modal-comercio-titulo" class="text-lg font-black">Nuevo comercio</h3>
+            <button type="button" data-close-modal="modal-comercio" class="btn-icon bg-slate-100 hover:bg-slate-200"><i class="fas fa-xmark"></i></button>
+        </div>
+
+        <form id="form-comercio" class="space-y-4">
+            <input type="hidden" id="c-id">
+
+            <div>
+                <label class="field-label">Nombre del comercio</label>
+                <input type="text" id="c-nombre" placeholder="Nombre del comercio" required class="field">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="field-label">Categoría</label>
+                    <input type="text" id="c-categoria" placeholder="Ej: Indumentaria" class="field">
+                </div>
+                <div>
+                    <label class="field-label">Orden</label>
+                    <input type="number" id="c-orden" placeholder="0" value="0" class="field">
+                </div>
+            </div>
+
+            <div>
+                <label class="field-label">Logo</label>
+                <div class="flex items-center gap-4">
+                    <img id="c-logo-preview" class="hidden h-16 w-16 rounded-full object-cover border border-slate-200">
+                    <label class="field flex items-center justify-center gap-2 cursor-pointer text-slate-500 hover:text-slate-700 hover:border-yellow-comunidad">
+                        <i class="fas fa-image"></i> <span id="c-logo-label">Elegir imagen</span>
+                        <input type="file" id="c-logo-file" accept="image/*" class="hidden">
+                    </label>
+                </div>
+                <input type="hidden" id="c-logoUrl">
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="submit" id="btn-guardar-comercio" class="btn-primary flex-1">Guardar comercio</button>
+                <button type="button" data-close-modal="modal-comercio" class="text-slate-500 font-bold px-6 py-3 text-sm hover:text-slate-700">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- ===================== MODAL: CONFIRMAR ===================== -->
 <div id="modal-confirmar" class="modal">
     <div class="modal-panel card w-full max-w-sm p-7 text-center">
@@ -360,5 +445,21 @@
 <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 bg-black text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-bold opacity-0 pointer-events-none translate-y-4 z-[70] flex items-center gap-2.5"></div>
 
 <script src="admin.js"></script>
+<script>
+    function abrirSidebarMobile() {
+        document.getElementById('sidebar').classList.remove('-translate-x-full');
+        document.getElementById('sidebar-overlay').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    function cerrarSidebarMobile() {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+        document.getElementById('sidebar-overlay').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+    // Si se agranda la ventana a desktop, aseguramos que quede todo limpio
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) cerrarSidebarMobile();
+    });
+</script>
 </body>
 </html>
